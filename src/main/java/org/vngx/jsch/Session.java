@@ -265,6 +265,7 @@ public final class Session implements Runnable {
 			_keyExchange = new KeyExchange(this);
 			_sessionId = _keyExchange.runFirstKex();
 			_sessionIO.initNewKeys(_keyExchange);
+			_hostKey = _keyExchange.getHostKey();
 
 			// Perform user authentication
 			if( !UserAuth.authenticateUser(this, password) ) {

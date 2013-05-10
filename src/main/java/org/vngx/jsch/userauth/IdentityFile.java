@@ -583,31 +583,23 @@ public class IdentityFile implements Identity {
 		}
 	}
 
+	/**
+	 * Get the unencrypted private key file bytes.
+	 */
+	public byte[] getPrivateKey() throws JSchException {
+		switch( _keyType ) {
+			case SSH_RSA: return getRSAPrivateKey();
+			case SSH_DSS: return getDSSPrivateKey();
+			default: throw new IllegalStateException("Failed to decrypt, invalid key type: "+_keyType);
+		}
+	}
+
 	boolean decryptRSA() {
 		try {
-			byte[] plain;
-			if( _encrypted ) {
-				if( _vendor == OPENSSH ) {
-					_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
-					plain = new byte[_encodedData.length];
-					_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
-				} else if( _vendor == FSECURE ) {
-					for( int i = 0; i < _iv.length; i++ ) {
-						_iv[i] = 0;
-					}
-					_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
-					plain = new byte[_encodedData.length];
-					_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
-				} else {
-					return false;
-				}
-			} else {
-				if( _nRSA != null ) {
-					return true;
-				}
-				plain = _encodedData;
+			if( !_encrypted && _nRSA != null ) {
+				return true;
 			}
-
+			byte[] plain = getRSAPrivateKey();
 			if( _vendor == FSECURE ) {              // FSecure
 				Buffer buf = new Buffer(plain);
 				int foo = buf.getInt();
@@ -657,31 +649,35 @@ public class IdentityFile implements Identity {
 		return true;
 	}
 
+	byte[] getRSAPrivateKey() throws JSchException {
+		byte[] plain;
+		if( _encrypted ) {
+			if( _vendor == OPENSSH ) {
+				_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
+				plain = new byte[_encodedData.length];
+				_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
+			} else if( _vendor == FSECURE ) {
+				for( int i = 0; i < _iv.length; i++ ) {
+					_iv[i] = 0;
+				}
+				_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
+				plain = new byte[_encodedData.length];
+				_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
+			} else {
+				throw new JSchException("Unknown vendor id: " + _vendor);
+			}
+		} else {
+			plain = _encodedData;
+		}
+		return plain;
+	}
+
 	boolean decryptDSS() {
 		try {
-			byte[] plain;
-			if( _encrypted ) {
-				if( _vendor == OPENSSH ) {
-					_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
-					plain = new byte[_encodedData.length];
-					_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
-				} else if( _vendor == FSECURE ) {
-					for( int i = 0; i < _iv.length; i++ ) {
-						_iv[i] = 0;
-					}
-					_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
-					plain = new byte[_encodedData.length];
-					_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
-				} else {
-					return false;
-				}
-			} else {
-				if( _pDSA != null ) {
-					return true;
-				}
-				plain = _encodedData;
+			if( !_encrypted && _pDSA != null ) {
+				return true;
 			}
-
+			byte[] plain = getDSSPrivateKey();
 			if( _vendor == FSECURE ) {              // FSecure
 				Buffer buf = new Buffer(plain);
 				int foo = buf.getInt();
@@ -726,6 +722,29 @@ public class IdentityFile implements Identity {
 			return false;
 		}
 		return true;
+	}
+
+	byte[] getDSSPrivateKey() throws JSchException {
+		byte[] plain;
+		if( _encrypted ) {
+			if( _vendor == OPENSSH ) {
+				_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
+				plain = new byte[_encodedData.length];
+				_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
+			} else if( _vendor == FSECURE ) {
+				for( int i = 0; i < _iv.length; i++ ) {
+					_iv[i] = 0;
+				}
+				_cipher.init(Cipher.DECRYPT_MODE, _key, _iv);
+				plain = new byte[_encodedData.length];
+				_cipher.update(_encodedData, 0, _encodedData.length, plain, 0);
+			} else {
+				throw new JSchException("Unknown vendor id: " + _vendor);
+			}
+		} else {
+			plain = _encodedData;
+		}
+		return plain;
 	}
 
 	@Override

@@ -426,4 +426,7 @@ public final class KeyExchange {
 		return _kexAlg;
 	}
 
+	public HostKey getHostKey() {
+		return _hostKey;
+	}
 }
