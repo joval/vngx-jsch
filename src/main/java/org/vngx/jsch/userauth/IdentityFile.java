@@ -29,6 +29,7 @@
 
 package org.vngx.jsch.userauth;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -587,11 +588,32 @@ public class IdentityFile implements Identity {
 	 * Get the unencrypted private key file bytes.
 	 */
 	public byte[] getPrivateKey() throws JSchException {
-		switch( _keyType ) {
-			case SSH_RSA: return getRSAPrivateKey();
-			case SSH_DSS: return getDSSPrivateKey();
-			default: throw new IllegalStateException("Failed to decrypt, invalid key type: "+_keyType);
+		if (_encrypted) {
+		    throw new IllegalStateException("Key is ecrypted");
 		}
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			switch( _keyType ) {
+				case SSH_RSA: {
+					out.write("-----BEGIN RSA PRIVATE KEY-----\n".getBytes("US-ASCII"));
+					byte[] b = getRSAPrivateKey();
+					out.write(Util.toBase64(b, 0, b.length));
+					out.write("\n-----END RSA PRIVATE KEY-----".getBytes("US-ASCII"));
+					break;
+				}
+				case SSH_DSS: {
+					out.write("-----BEGIN DSS PRIVATE KEY-----\n".getBytes("US-ASCII"));
+					byte[] b = getDSSPrivateKey();
+					out.write(Util.toBase64(b, 0, b.length));
+					out.write("\n-----END DSS PRIVATE KEY-----".getBytes("US-ASCII"));
+					break;
+				}
+				default:
+					throw new IllegalStateException("Failed to decrypt, invalid key type: "+_keyType);
+			}
+		} catch (IOException e) {
+		}
+		return out.toByteArray();
 	}
 
 	boolean decryptRSA() {
