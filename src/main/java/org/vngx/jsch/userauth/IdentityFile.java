@@ -585,32 +585,47 @@ public class IdentityFile implements Identity {
 	}
 
 	/**
-	 * Get the unencrypted private key file bytes.
+	 * Get the unencrypted private key file bytes, in PEM format.
 	 */
-	public byte[] getPrivateKey() throws JSchException {
+	public byte[] getPrivateKeyPEM() throws JSchException {
 		if (_encrypted) {
 		    throw new IllegalStateException("Key is ecrypted");
 		}
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
+			byte[] type = null;
+			byte[] b = null;
 			switch( _keyType ) {
-				case SSH_RSA: {
-					out.write("-----BEGIN RSA PRIVATE KEY-----\n".getBytes("US-ASCII"));
-					byte[] b = getRSAPrivateKey();
-					out.write(Util.toBase64(b, 0, b.length));
-					out.write("\n-----END RSA PRIVATE KEY-----".getBytes("US-ASCII"));
+				case SSH_RSA:
+					type = "RSA".getBytes("US-ASCII");
+					b = getRSAPrivateKey();
 					break;
-				}
-				case SSH_DSS: {
-					out.write("-----BEGIN DSS PRIVATE KEY-----\n".getBytes("US-ASCII"));
-					byte[] b = getDSSPrivateKey();
-					out.write(Util.toBase64(b, 0, b.length));
-					out.write("\n-----END DSS PRIVATE KEY-----".getBytes("US-ASCII"));
+				case SSH_DSS:
+					type = "DSS".getBytes("US-ASCII");
+					b = getDSSPrivateKey();
 					break;
-				}
 				default:
 					throw new IllegalStateException("Failed to decrypt, invalid key type: "+_keyType);
 			}
+			out.write("-----BEGIN ".getBytes("US-ASCII"));
+			out.write(type);
+			out.write(" PRIVATE KEY-----\n".getBytes("US-ASCII"));
+			if (b.length > 0) {
+				b = Util.toBase64(b, 0, b.length);
+				int iter = b.length / 64;
+				for (int i=0; i < iter; i++) {
+					out.write(b, i * 64, 64);
+					out.write('\n');
+				}
+				int rem = b.length % 64;
+				if (rem > 0) {
+					out.write(b, b.length - rem, rem);
+					out.write('\n');
+				}
+			}
+			out.write("-----END ".getBytes("US-ASCII"));
+			out.write(type);
+			out.write(" PRIVATE KEY-----".getBytes("US-ASCII"));
 		} catch (IOException e) {
 		}
 		return out.toByteArray();
