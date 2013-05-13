@@ -35,7 +35,9 @@ import org.vngx.jsch.Session;
 import org.vngx.jsch.Util;
 import org.vngx.jsch.constants.MessageConstants;
 import org.vngx.jsch.exception.JSchException;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Implementation of <code>UserAuth</code> for authenticating an SSH session
@@ -51,7 +53,12 @@ public final class UserAuthPublicKey extends UserAuth {
 		super.authUser(session, password);
 
 		byte[] passphrase = null;
-		final Set<Identity> identities = IdentityManager.getManager().getIdentities();
+		final Collection<Identity> identities;
+		if (_userinfo == null || _userinfo.getIdentity() == null) {
+		    identities = IdentityManager.getManager().getIdentities();
+		} else {
+		    identities = Collections.unmodifiableCollection(Arrays.asList(_userinfo.getIdentity()));
+		}
 		synchronized ( identities ) {
 			if( identities.isEmpty() ) {
 				return false;

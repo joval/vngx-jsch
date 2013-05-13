@@ -29,6 +29,8 @@
 
 package org.vngx.jsch;
 
+import org.vngx.jsch.userauth.Identity;
+
 /**
  * <p>An interface defining an API for a user interface to retrieve user input
  * and display messages.  Implementations should take care to provide the best
@@ -62,6 +64,15 @@ public interface UserInfo {
 	 * @return password entered by user or null if none provided
 	 */
 	String getPassword(); // TODO Consider returning byte[]
+
+	/**
+	 * <p>Returns the identity that should be used for the connection.
+	 * A {@code null} return value indicates that the identity should be
+	 * determined using the IdentityManager class.
+	 *
+	 * @return Identity specified by the class, or null if none provided
+	 */
+	Identity getIdentity();
 
 	/**
 	 * <p>Prompts the user with the specified {@code message} to enter a
@@ -108,5 +119,4 @@ public interface UserInfo {
 	 * @param message to display
 	 */
 	void showMessage(String message);
-
 }
