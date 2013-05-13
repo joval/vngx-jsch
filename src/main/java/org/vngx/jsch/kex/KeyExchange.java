@@ -349,6 +349,16 @@ public final class KeyExchange {
 
 		boolean insert = false;
 		String shkc = _session.getConfig().getString(SessionConfig.STRICT_HOST_KEY_CHECKING);
+
+		//
+		// In query mode, the known_hosts repository is bypassed, and the UserInfo (if set) is always queried.
+		//
+		if ("query".equals(shkc) && _userinfo != null) {
+			if ( !_userinfo.queryHostKey(new HostKey(chost, kex.K_S)) ) {
+				throw new JSchException("HostKey was rejected (StrictHostKeyChecking:query): " + chost);
+			}
+		}
+
 		if( ("ask".equals(shkc) || "yes".equals(shkc)) && keyCheck == Check.CHANGED ) {
 			String file = hkr.getKnownHostsRepositoryID() != null ?
 				hkr.getKnownHostsRepositoryID() : SSHConstants.KNOWN_HOSTS;

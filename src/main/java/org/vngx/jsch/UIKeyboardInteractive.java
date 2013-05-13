@@ -45,6 +45,6 @@ public interface UIKeyboardInteractive {
 	 * @param echo
 	 * @return
 	 */
-	String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt, boolean[] echo);
+	byte[][] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt, boolean[] echo);
 
 }

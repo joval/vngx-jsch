@@ -114,7 +114,7 @@ public final class UserAuthPublicKey extends UserAuth {
 							throw new AuthCancelException("UserAuth 'publickey' canceled by user");
 						}
 						if( _userinfo.getPassphrase() != null ) {
-							passphrase = Util.str2byte(_userinfo.getPassphrase());
+							passphrase = _userinfo.getPassphrase();
 						}
 					}
 

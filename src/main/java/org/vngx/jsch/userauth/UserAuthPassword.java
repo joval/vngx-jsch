@@ -64,7 +64,7 @@ public final class UserAuthPassword extends UserAuth {
 					} else if( _userinfo.getPassword() == null ) {
 						throw new AuthCancelException("UserAuth 'password' canceled, password is null");
 					}
-					password = Util.str2byte(_userinfo.getPassword());
+					password = _userinfo.getPassword();
 				}
 
 				// send user auth password request
@@ -138,7 +138,7 @@ public final class UserAuthPassword extends UserAuth {
 		}
 
 		UIKeyboardInteractive kbi = (UIKeyboardInteractive) _userinfo;
-		String[] response = kbi.promptKeyboardInteractive(
+		byte[][] response = kbi.promptKeyboardInteractive(
 				_passwordPrompt, "Password Change Required", Util.byte2str(instruction),
 				new String[]{"New Password: "}, new boolean[]{false});
 		if( response == null ) {
@@ -161,7 +161,7 @@ public final class UserAuthPassword extends UserAuth {
 		_buffer.putByte((byte) 1);
 		_buffer.putString(password);	// Original password
 
-		byte[] newpassword = Util.str2byte(response[0]);
+		byte[] newpassword = response[0];
 		_buffer.putString(newpassword);
 		Util.bzero(newpassword);
 

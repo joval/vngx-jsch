@@ -32,6 +32,7 @@ package org.vngx.jsch.userauth;
 import org.vngx.jsch.Session;
 import org.vngx.jsch.UIKeyboardInteractive;
 import org.vngx.jsch.Util;
+import org.vngx.jsch.constants.MessageConstants;
 
 /**
  * Implementation of <code>UserAuth</code> for authenticating an SSH session
@@ -50,8 +51,6 @@ public final class UserAuthKeyboardInteractive extends UserAuth {
 		super.authUser(session, password);
 		if( !(_userinfo instanceof UIKeyboardInteractive) ) {
 			return false;	// Fail if no keyboard interactive interface available
-		} else if (password == null) {
-			password = _userinfo.getPassword().getBytes();
 		}
 		_passwordPrompt = createPasswordPrompt(session);
 
@@ -112,13 +111,7 @@ public final class UserAuthKeyboardInteractive extends UserAuth {
 							password = null;
 						} else if( num > 0 || (name.length() > 0 || instruction.length() > 0) ) {
 							UIKeyboardInteractive kbi = (UIKeyboardInteractive) _userinfo;
-							String[] _response = kbi.promptKeyboardInteractive(_passwordPrompt, name, instruction, prompt, echo);
-							if( _response != null ) {
-								response = new byte[_response.length][];
-								for( int i = 0; i < _response.length; i++ ) {
-									response[i] = Util.str2byte(_response[i]);
-								}
-							}
+							response = kbi.promptKeyboardInteractive(_passwordPrompt, name, instruction, prompt, echo);
 						}
 
 						// byte      SSH_MSG_USERAUTH_INFO_RESPONSE(61)

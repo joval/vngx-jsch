@@ -89,7 +89,7 @@ public class JSchConfig implements SSHConfigConstants {
 	 */
 	static {
 		// Set the default global configuration values
-		VALIDATORS.put(STRICT_HOST_KEY_CHECKING, new StringSetPropertyValidator("ask", "ask", "yes", "no"));
+		VALIDATORS.put(STRICT_HOST_KEY_CHECKING, new StringSetPropertyValidator("ask", "ask", "yes", "no", "query"));
 		VALIDATORS.put(HASH_KNOWN_HOSTS, BooleanPropertyValidator.DEFAULT_FALSE_VALIDATOR);
 		VALIDATORS.put(COMPRESSION_LEVEL, NumberPropertyValidator.createValidator(0, 9, 6));
 

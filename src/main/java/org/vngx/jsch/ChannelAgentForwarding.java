@@ -38,7 +38,8 @@ import org.vngx.jsch.userauth.Identity;
 import org.vngx.jsch.util.Logger.Level;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Implementation of <code>Channel</code> for agent forwarding. Agent forwarding
@@ -129,8 +130,13 @@ final class ChannelAgentForwarding extends Channel {
 
 		int typ = _readBuffer.getByte();
 
-		Set<Identity> identities = IdentityManager.getManager().getIdentities();
 		UserInfo userinfo = _session.getUserInfo();
+		Collection<Identity> identities = null;
+		if (userinfo.getIdentity() == null) {
+			identities = IdentityManager.getManager().getIdentities();
+		} else {
+			identities = Collections.unmodifiableCollection(Arrays.asList(userinfo.getIdentity()));
+		}
 
 		if( typ == SSH2_AGENTC_REQUEST_IDENTITIES ) {
 			_messageBuffer.reset();
@@ -175,12 +181,12 @@ final class ChannelAgentForwarding extends Channel {
 							if( !userinfo.promptPassphrase(String.format(MessageConstants.PROMPT_PASSPHRASE, _identity.getName())) ) {
 								break;
 							}
-							String _passphrase = userinfo.getPassphrase();
+							byte[] _passphrase = userinfo.getPassphrase();
 							if( _passphrase == null ) {
 								break;
 							}
 
-							byte[] passphrase = Util.str2byte(_passphrase);
+							byte[] passphrase = _passphrase;
 							try {
 								if( _identity.setPassphrase(passphrase) ) {
 									break;

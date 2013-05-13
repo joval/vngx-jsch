@@ -30,6 +30,7 @@
 package org.vngx.jsch;
 
 import org.vngx.jsch.userauth.Identity;
+import org.vngx.jsch.util.HostKey;
 
 /**
  * <p>An interface defining an API for a user interface to retrieve user input
@@ -52,7 +53,7 @@ public interface UserInfo {
 	 *
 	 * @return passphrase entered by user or null if none provided
 	 */
-	String getPassphrase();	// TODO Consider returning byte[]
+	byte[] getPassphrase();	// TODO Consider returning byte[]
 
 	/**
 	 * <p>Returns the password provided by the user after a successful call to
@@ -63,7 +64,7 @@ public interface UserInfo {
 	 *
 	 * @return password entered by user or null if none provided
 	 */
-	String getPassword(); // TODO Consider returning byte[]
+	byte[] getPassword(); // TODO Consider returning byte[]
 
 	/**
 	 * <p>Returns the identity that should be used for the connection.
@@ -73,6 +74,16 @@ public interface UserInfo {
 	 * @return Identity specified by the class, or null if none provided
 	 */
 	Identity getIdentity();
+
+	/**
+	 * <p>Returns whether or not the specified HostKey should be trusted for reception
+	 * of authentication information. This method is only called when the Session is
+	 * configured using STRICT_HOST_KEY_CHECKING = "query", and bypasses the known_hosts
+	 * file.
+	 *
+	 * @return true if the host key is trusted, false if not.
+	 */
+	boolean queryHostKey(HostKey key);
 
 	/**
 	 * <p>Prompts the user with the specified {@code message} to enter a
