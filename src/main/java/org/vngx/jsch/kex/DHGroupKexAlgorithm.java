@@ -111,7 +111,7 @@ public abstract class DHGroupKexAlgorithm extends AbstractDHKexAlgorithm {
 		_buffer.putMPInt(_e);
 		_session.write(_packet);
 		_state = SSH_MSG_KEXDH_REPLY;
-		JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXDH_INIT sent, expecting SSH_MSG_KEXDH_REPLY");
+		_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXDH_INIT sent, expecting SSH_MSG_KEXDH_REPLY");
 	}
 
 	@Override
@@ -161,7 +161,7 @@ public abstract class DHGroupKexAlgorithm extends AbstractDHKexAlgorithm {
 				_H = _hash.digest(); // Generate hash from concatenated values
 
 				boolean verifiedHost = verifyHostKey(sigOfH);
-				JSch.getLogger().log(Logger.Level.INFO, "Host key "+_hostKeyType+" signature verified: " + verifiedHost);
+				_session.getLogger().log(Logger.Level.INFO, "Host key "+_hostKeyType+" signature verified: " + verifiedHost);
 				_state = STATE_END;
 				return verifiedHost;
 

@@ -106,7 +106,7 @@ final class ChannelAgentForwarding extends Channel {
 			sendOpenConfirmation();
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.DEBUG, "Failed to send channel open confirmation", e);
+			_session.getLogger().log(Level.DEBUG, "Failed to send channel open confirmation", e);
 			_closed = true;
 			disconnect();
 		}

@@ -528,7 +528,7 @@ public abstract class Channel implements Runnable {
 			}
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.DEBUG, "Failed to send channel EOF local", e);
+			_session.getLogger().log(Level.DEBUG, "Failed to send channel EOF local", e);
 		}
 	}
 
@@ -577,7 +577,7 @@ public abstract class Channel implements Runnable {
 			}
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.DEBUG, "Failed to send channel close", e);
+			_session.getLogger().log(Level.DEBUG, "Failed to send channel close", e);
 		}
 	}
 
@@ -746,7 +746,7 @@ public abstract class Channel implements Runnable {
 			_session.write(packet);
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to send channel open failure", e);
+			_session.getLogger().log(Level.WARN, "Failed to send channel open failure", e);
 		}
 	}
 

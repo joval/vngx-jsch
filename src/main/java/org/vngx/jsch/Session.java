@@ -137,6 +137,8 @@ public final class Session implements Runnable {
 	/** True if agent forwarding is enabled in session (set with RequestAgentForwarding). */
 	boolean _agentForwarding = false;
 
+	/** Logger instance (null by default). */
+	private Logger $logger = Logger.NULL_LOGGER;
 
 	private SessionIO _sessionIO;
 
@@ -189,6 +191,25 @@ public final class Session implements Runnable {
 	}
 
 	/**
+	 * Returns the <code>Logger</code> instance to use for logging.
+	 *
+	 * @return logger instance
+	 */
+	public Logger getLogger() {
+		return $logger;
+	}
+
+	/**
+	 * Sets the <code>Logger</code> instance to use for logging.  Setting the
+	 * logger to null turns off all internal logging for the session.
+	 *
+	 * @param logger to use
+	 */
+	public void setLogger(Logger logger) {
+		$logger = logger != null ? logger : Logger.NULL_LOGGER;
+	}
+
+	/**
 	 * Starts the SSH session by connecting to the remote host, establishing
 	 * a key exchange, determining encryption methods and performing the user
 	 * authentication/authorization.
@@ -225,7 +246,7 @@ public final class Session implements Runnable {
 		if( _connected ) {
 			throw new JSchException("Session is already connected");
 		}
-		JSch.getLogger().log(Logger.Level.INFO, "Connecting to " + _host + " port " + _port);
+		$logger.log(Logger.Level.INFO, "Connecting to " + _host + " port " + _port);
 
 		try {
 			/* Create the socket to the remote host and set the input/output
@@ -254,12 +275,12 @@ public final class Session implements Runnable {
 			}
 			_connected = true;		// Set connected as true (socket is connected)
 			_sessionIO = SessionIO.createIO(this, _io.in, _io._out);
-			JSch.getLogger().log(Logger.Level.INFO, "Connection established");
+			$logger.log(Logger.Level.INFO, "Connection established");
 
 			// Exchange version information (send client version, read server version)
 			_versionExchange.exchangeVersions(_io.in, _io._out);
-			JSch.getLogger().log(Logger.Level.INFO, "Server SSH version: " + getServerVersion());
-			JSch.getLogger().log(Logger.Level.INFO, "Client SSH version: " + getClientVersion());
+			$logger.log(Logger.Level.INFO, "Server SSH version: " + getServerVersion());
+			$logger.log(Logger.Level.INFO, "Client SSH version: " + getClientVersion());
 
 			// Create key exchange and start kex process
 			_keyExchange = new KeyExchange(this);
@@ -420,8 +441,8 @@ public final class Session implements Runnable {
 				buffer.getInt();
 				buffer.getShort();
 				int reasonId = buffer.getInt();
-				if( JSch.getLogger().isEnabled(Logger.Level.INFO) ) {
-					JSch.getLogger().log(Logger.Level.INFO, "Received SSH_MSG_UNIMPLEMENTED for " + reasonId);
+				if( $logger.isEnabled(Logger.Level.INFO) ) {
+					$logger.log(Logger.Level.INFO, "Received SSH_MSG_UNIMPLEMENTED for " + reasonId);
 				}
 			} else if( type == SSH_MSG_DEBUG ) {
 				buffer.getInt();
@@ -797,8 +818,8 @@ public final class Session implements Runnable {
 				// just closing the session
 			} else {
 				_keyExchange.kexCompleted();
-				if( JSch.getLogger().isEnabled(Logger.Level.INFO) ) {
-					JSch.getLogger().log(Logger.Level.INFO,
+				if( $logger.isEnabled(Logger.Level.INFO) ) {
+					$logger.log(Logger.Level.INFO,
 						"Caught an exception, leaving main loop due to " + e, e);
 				}
 			}
@@ -821,8 +842,8 @@ public final class Session implements Runnable {
 		if( !_connected ) {
 			return;
 		}
-		if( JSch.getLogger().isEnabled(Logger.Level.INFO) ) {
-			JSch.getLogger().log(Logger.Level.INFO, "Disconnecting from "+_host+" port "+_port);
+		if( $logger.isEnabled(Logger.Level.INFO) ) {
+			$logger.log(Logger.Level.INFO, "Disconnecting from "+_host+" port "+_port);
 		}
 
 		// Close all the open channels for this session

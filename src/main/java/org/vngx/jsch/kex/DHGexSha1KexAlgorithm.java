@@ -132,7 +132,7 @@ public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 		_buffer.putInt(MAX_GROUP_BITS);
 		_session.write(_packet);
 		_state = SSH_MSG_KEX_DH_GEX_GROUP;
-		JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEX_DH_GEX_REQUEST(" + MIN_GROUP_BITS + "<" + PREFERRED_GROUP_BITS +
+		_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEX_DH_GEX_REQUEST(" + MIN_GROUP_BITS + "<" + PREFERRED_GROUP_BITS +
 				"<" + MAX_GROUP_BITS + ") sent, expecting SSH_MSG_KEX_DH_GEX_GROUP(31)");
 	}
 
@@ -163,7 +163,7 @@ public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 				_buffer.putMPInt(_e);
 				_session.write(_packet);
 				_state = SSH_MSG_KEX_DH_GEX_REPLY;	// Update state for next call
-				JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEX_DH_GEX_INIT(32) sent, expecting SSH_MSG_KEX_DH_GEX_REPLY(33)");
+				_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEX_DH_GEX_INIT(32) sent, expecting SSH_MSG_KEX_DH_GEX_REPLY(33)");
 				return true;
 
 			case SSH_MSG_KEX_DH_GEX_REPLY:
@@ -222,7 +222,7 @@ public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 				_H = _hash.digest(); // Generate hash from concatenated values
 
 				boolean verifiedHost = verifyHostKey(sigOfH);
-				JSch.getLogger().log(Logger.Level.INFO, "Host key "+_hostKeyType+" signature verified: " + verifiedHost);
+				_session.getLogger().log(Logger.Level.INFO, "Host key "+_hostKeyType+" signature verified: " + verifiedHost);
 				_state = STATE_END;
 				return verifiedHost;
 

@@ -186,7 +186,7 @@ class ChannelSession extends Channel {
 			request.request(_session, this);
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to send channel window change request", e);
+			_session.getLogger().log(Level.WARN, "Failed to send channel window change request", e);
 		}
 	}
 
@@ -278,7 +278,7 @@ class ChannelSession extends Channel {
 			}
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to run channel session", e);
+			_session.getLogger().log(Level.WARN, "Failed to run channel session", e);
 		}
 		final Thread thread = _thread;
 		if( thread != null ) {

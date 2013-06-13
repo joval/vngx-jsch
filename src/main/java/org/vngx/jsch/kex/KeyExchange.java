@@ -124,7 +124,7 @@ public final class KeyExchange {
 		if( _session.read(_buffer).getCommand() != SSH_MSG_KEXINIT ) {
 			throw new KexException("Invalid kex protocol, expected SSH_MSG_KEXINIT(20): " + _buffer.getCommand());
 		}
-		JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXINIT received");
+		_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXINIT received");
 
 		// Read server response and generate appropriate kex algorithm
 		receiveKexInit(_buffer);
@@ -138,7 +138,7 @@ public final class KeyExchange {
 		if( _session.read(_buffer).getCommand() != SSH_MSG_NEWKEYS ) {
 			throw new KexException("Invalid kex protocol, expected SSH_MSG_NEWKEYS(21): " + _buffer.getCommand());
 		}
-		JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_NEWKEYS received");
+		_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_NEWKEYS received");
 
 		// Return the session ID (copy of exchange hash H) from first kex
 		return Util.copyOf(_kexAlg.getH(), _kexAlg.getH().length);
@@ -220,7 +220,7 @@ public final class KeyExchange {
 			I_C = new byte[kexBuffer.getIndex()-5];
 			System.arraycopy(kexBuffer.getArray(), 5, I_C, 0, I_C.length);
 			_session.write(kexPacket);	// Send key exchange init message to server
-			JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXINIT sent");
+			_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_KEXINIT sent");
 		} catch(Exception e) {
 			throw new KexException("Failed to send SSH_MSG_KEXINIT", e);
 		} finally {
@@ -255,9 +255,9 @@ public final class KeyExchange {
 		}
 
 		// Guess algorithms to use from the client's and server's proposals
-		_proposal = KexProposal.createProposal(I_S, I_C);
-		if( JSch.getLogger().isEnabled(Logger.Level.DEBUG) ) {
-			JSch.getLogger().log(Level.DEBUG, _proposal.toString());
+		_proposal = KexProposal.createProposal(I_S, I_C, _session);
+		if( _session.getLogger().isEnabled(Logger.Level.DEBUG) ) {
+			_session.getLogger().log(Level.DEBUG, _proposal.toString());
 		}
 
 		// If not authorized yet, don't allow 'none' cipher to be used, throw
@@ -270,7 +270,7 @@ public final class KeyExchange {
 
 		// Attempt to create kex algorithm to perform kex
 		try {
-			JSch.getLogger().log(Logger.Level.INFO, "Kex method: " + _proposal.getKexAlg());
+			_session.getLogger().log(Logger.Level.INFO, "Kex method: " + _proposal.getKexAlg());
 			_kexAlg = AlgorithmManager.getManager().createAlgorithm(_proposal.getKexAlg(), _session);
 			_kexAlg.init(_session, I_C, I_S);	// Initialize and return
 		} catch(Exception e) {
@@ -315,7 +315,7 @@ public final class KeyExchange {
 			packet.reset();
 			buffer.putByte(SSH_MSG_NEWKEYS);
 			_session.write(packet);
-			JSch.getLogger().log(Logger.Level.INFO, "SSH_MSG_NEWKEYS sent");
+			_session.getLogger().log(Logger.Level.INFO, "SSH_MSG_NEWKEYS sent");
 		} catch(Exception e) {
 			throw new KexException("Failed to send SSH_MSG_NEWKEYS request", e);
 		}
@@ -407,11 +407,11 @@ public final class KeyExchange {
 		if( "no".equals(shkc) && keyCheck == Check.NOT_INCLUDED ) {
 			insert = true;
 		}
-		if( keyCheck == Check.OK && JSch.getLogger().isEnabled(Logger.Level.INFO) ) {
-			JSch.getLogger().log(Logger.Level.INFO, "Host '"+chost+"' is known and matches the "+kex._hostKeyType+" host key");
+		if( keyCheck == Check.OK && _session.getLogger().isEnabled(Logger.Level.INFO) ) {
+			_session.getLogger().log(Logger.Level.INFO, "Host '"+chost+"' is known and matches the "+kex._hostKeyType+" host key");
 		}
-		if( insert && JSch.getLogger().isEnabled(Logger.Level.WARN) ) {
-			JSch.getLogger().log(Logger.Level.WARN, "Permanently added '"+chost+"' ("+kex._hostKeyType+") to the list of known hosts.");
+		if( insert && _session.getLogger().isEnabled(Logger.Level.WARN) ) {
+			_session.getLogger().log(Logger.Level.WARN, "Permanently added '"+chost+"' ("+kex._hostKeyType+") to the list of known hosts.");
 		}
 
 		// Create host key instance

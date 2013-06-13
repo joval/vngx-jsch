@@ -29,7 +29,6 @@
 
 package org.vngx.jsch.proxy;
 
-import org.vngx.jsch.JSch;
 import org.vngx.jsch.Util;
 import org.vngx.jsch.util.Logger.Level;
 import java.io.InputStream;
@@ -61,7 +60,6 @@ public abstract class AbstractProxy implements Proxy {
 	protected String _user;
 	/** Password for authenticating against proxy. */
 	protected byte[] _password;
-
 
 	/**
 	 * Creates a new instance of <code>AbstractProxy</code> with the specified
@@ -131,7 +129,6 @@ public abstract class AbstractProxy implements Proxy {
 				_proxyIn.close();
 			}
 		} catch(Exception e) {
-			JSch.getLogger().log(Level.ERROR, "Failed to close proxy InputStream", e);
 		} finally {
 			_proxyIn = null;
 		}
@@ -140,7 +137,6 @@ public abstract class AbstractProxy implements Proxy {
 				_proxyOut.close();
 			}
 		} catch(Exception e) {
-			JSch.getLogger().log(Level.ERROR, "Failed to close proxy OutputStream", e);
 		} finally {
 			_proxyOut = null;
 		}
@@ -149,7 +145,6 @@ public abstract class AbstractProxy implements Proxy {
 				_socket.close();
 			}
 		} catch(Exception e) {
-			JSch.getLogger().log(Level.ERROR, "Failed to close proxy Socket", e);
 		} finally {
 			_socket = null;
 		}

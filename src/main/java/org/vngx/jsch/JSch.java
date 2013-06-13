@@ -34,7 +34,6 @@ import org.vngx.jsch.constants.SSHConstants;
 import org.vngx.jsch.exception.JSchException;
 import org.vngx.jsch.util.HostKeyRepository;
 import org.vngx.jsch.util.KnownHosts;
-import org.vngx.jsch.util.Logger;
 import java.io.InputStream;
 
 /**
@@ -60,10 +59,6 @@ public final class JSch {
 	
 	/** Repository for managing known hosts (host keys). */
 	private final HostKeyRepository _hostKeyRepository = new KnownHosts();
-
-	/** Logger instance (null by default). */
-	private static Logger $logger = Logger.NULL_LOGGER;
-
 
 	/**
 	 * Private constructor to prevent direct instantiation of singleton.
@@ -160,24 +155,4 @@ public final class JSch {
 	public static String getVersion() {
 		return VERSION;
 	}
-	
-	/**
-	 * Returns the <code>Logger</code> instance to use for logging.
-	 *
-	 * @return logger instance
-	 */
-	public static Logger getLogger() {
-		return $logger;
-	}
-
-	/**
-	 * Sets the <code>Logger</code> instance to use for logging.  Setting the
-	 * logger to null turns off all internal logging.
-	 *
-	 * @param logger to use
-	 */
-	public static void setLogger(Logger logger) {
-		$logger = logger != null ? logger : Logger.NULL_LOGGER;
-	}
-
 }

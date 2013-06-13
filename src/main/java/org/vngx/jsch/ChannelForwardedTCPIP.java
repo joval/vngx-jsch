@@ -139,7 +139,7 @@ public class ChannelForwardedTCPIP extends Channel {
 			}
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to run ChannelForwardedTCPIP", e);
+			_session.getLogger().log(Level.WARN, "Failed to run ChannelForwardedTCPIP", e);
 		}
 		disconnect();
 	}
@@ -348,7 +348,7 @@ public class ChannelForwardedTCPIP extends Channel {
 			session.write(packet);
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to send delete forwarded port", e);
+			session.getLogger().log(Level.WARN, "Failed to send delete forwarded port", e);
 		}
 	}
 

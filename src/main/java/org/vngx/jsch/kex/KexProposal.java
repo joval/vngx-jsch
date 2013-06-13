@@ -33,7 +33,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.vngx.jsch.Buffer;
-import org.vngx.jsch.JSch;
+import org.vngx.jsch.Session;
 import org.vngx.jsch.Util;
 import org.vngx.jsch.util.Logger.Level;
 
@@ -142,7 +142,7 @@ public final class KexProposal {
 	 * @return kex proposals or null if failure to guess
 	 * @throws KexException if algorithm negotiation fails
 	 */
-	static KexProposal createProposal(final byte[] I_S, final byte[] I_C) throws KexException {
+	static KexProposal createProposal(final byte[] I_S, final byte[] I_C, Session session) throws KexException {
 		Buffer serverBuffer = new Buffer(I_S);	// Wrap in Buffers to easily
 		Buffer clientBuffer = new Buffer(I_C);	// read Strings
 		serverBuffer.setOffSet(17);	// Skip over message code and 16 bytes of 
@@ -154,9 +154,9 @@ public final class KexProposal {
 			// Parse out server and client proposal lists
 			serverProposals = Arrays.asList(Util.split(Util.byte2str(serverBuffer.getString()), ","));
 			clientProposals = Arrays.asList(Util.split(Util.byte2str(clientBuffer.getString()), ","));
-			if( JSch.getLogger().isEnabled(Level.DEBUG) ) {
-				JSch.getLogger().log(Level.DEBUG, "Kex: S proposes "+p+" -> "+serverProposals);
-				JSch.getLogger().log(Level.DEBUG, "Kex: C proposes "+p+" -> "+clientProposals);
+			if( session.getLogger().isEnabled(Level.DEBUG) ) {
+				session.getLogger().log(Level.DEBUG, "Kex: S proposes "+p+" -> "+serverProposals);
+				session.getLogger().log(Level.DEBUG, "Kex: C proposes "+p+" -> "+clientProposals);
 			}
 
 			// Client preference is used for each proposal; check if server

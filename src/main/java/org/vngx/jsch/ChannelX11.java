@@ -249,7 +249,7 @@ class ChannelX11 extends Channel {
 			}
 		} catch (Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.WARN, "Failed to run channel X11", e);
+			_session.getLogger().log(Level.WARN, "Failed to run channel X11", e);
 		} finally {
 			disconnect();	// Always disconnect at end
 		}

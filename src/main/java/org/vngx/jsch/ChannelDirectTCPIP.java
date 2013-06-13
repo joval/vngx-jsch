@@ -166,7 +166,7 @@ public class ChannelDirectTCPIP extends Channel {
 			}
 		} catch(Exception e) {
 			/* Ignore error, don't bubble exception. */
-			JSch.getLogger().log(Level.DEBUG, "Failed to run ChannelDirectTCPIP", e);
+			_session.getLogger().log(Level.DEBUG, "Failed to run ChannelDirectTCPIP", e);
 		}
 		disconnect();	// Disconnect after finished reading from stream
 	}

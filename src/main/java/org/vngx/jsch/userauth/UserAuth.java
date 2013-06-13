@@ -275,13 +275,13 @@ public abstract class UserAuth implements UserAuthProtocol {
 			if( !UserAuth.NONE.equals(userAuthMethod) && !serverMethods.contains(userAuthMethod) ) {
 				continue;	// Server does not support user auth method, skip
 			}
-			JSch.getLogger().log(Level.INFO, "Authentication methods that can continue: " + (serverMethods != null ? serverMethods : NONE));
-			JSch.getLogger().log(Level.INFO, "Current authentication method: " + userAuthMethod);
+			session.getLogger().log(Level.INFO, "Authentication methods that can continue: " + (serverMethods != null ? serverMethods : NONE));
+			session.getLogger().log(Level.INFO, "Current authentication method: " + userAuthMethod);
 
 			try {	// Attempt to create UserAuth method instance
 				userAuth = session.getConfig().getClassImpl(Algorithms.USERAUTH + userAuthMethod);
 			} catch(Exception e) {
-				JSch.getLogger().log(Level.WARN, "Failed to load UserAuth method '" + userAuthMethod + "': "+e, e);
+				session.getLogger().log(Level.WARN, "Failed to load UserAuth method '" + userAuthMethod + "': "+e, e);
 				continue;	// Attempt next user auth method since this one failed/not supported...
 			}
 
@@ -289,7 +289,7 @@ public abstract class UserAuth implements UserAuthProtocol {
 			try {
 				// Attempt to authenticate user with method
 				if( userAuth.authUser(session, password) ) {
-					JSch.getLogger().log(Level.INFO, "Authentication succeeded, method: " + userAuthMethod);
+					session.getLogger().log(Level.INFO, "Authentication succeeded, method: " + userAuthMethod);
 					return true;	// Return true since user has been authed!
 				}
 			} catch(AuthCancelException ee) {
@@ -324,7 +324,7 @@ public abstract class UserAuth implements UserAuthProtocol {
 		buffer.putByte(SSH_MSG_SERVICE_REQUEST);
 		buffer.putString(SSH_USERAUTH);
 		session.write(packet);
-		JSch.getLogger().log(Level.INFO, "SSH_MSG_SERVICE_REQUEST for UserAuth sent");
+		session.getLogger().log(Level.INFO, "SSH_MSG_SERVICE_REQUEST for UserAuth sent");
 
 		// receive user auth response
 		// byte      SSH_MSG_SERVICE_ACCEPT(6)
@@ -332,7 +332,7 @@ public abstract class UserAuth implements UserAuthProtocol {
 		if( session.read(buffer).getCommand() != SSH_MSG_SERVICE_ACCEPT ) {
 			throw new JSchException("UserAuth service failed, expected SSH_MSG_SERVICE_ACCEPT(6): "+buffer.getCommand());
 		}
-		JSch.getLogger().log(Level.INFO, "SSH_MSG_SERVICE_ACCEPT for UserAuth received");
+		session.getLogger().log(Level.INFO, "SSH_MSG_SERVICE_ACCEPT for UserAuth received");
 	}
 
 	/**
