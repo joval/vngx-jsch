@@ -121,4 +121,4 @@ CLASSES=\
 	org.vngx.jsch.util.Logger	\
 	org.vngx.jsch.util.SocketFactory	\
 	org.vngx.jsch.Util	\
-	org.vngx.jsch.VersionExchange	\
+	org.vngx.jsch.VersionExchange
