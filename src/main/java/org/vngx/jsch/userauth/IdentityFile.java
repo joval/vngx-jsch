@@ -202,6 +202,8 @@ public class IdentityFile implements Identity {
 					i += 6;
 					if( buf[i] == 'D' && buf[i + 1] == 'S' && buf[i + 2] == 'A' ) {
 						_keyType = KeyType.SSH_DSS;
+					} else if( buf[i] == 'D' && buf[i + 1] == 'S' && buf[i + 2] == 'S' ) {
+						_keyType = KeyType.SSH_DSS;
 					} else if( buf[i] == 'R' && buf[i + 1] == 'S' && buf[i + 2] == 'A' ) {
 						_keyType = KeyType.SSH_RSA;
 					} else if( buf[i] == 'S' && buf[i + 1] == 'S' && buf[i + 2] == 'H' ) { // FSecure
