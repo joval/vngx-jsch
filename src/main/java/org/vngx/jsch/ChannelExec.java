@@ -57,7 +57,7 @@ public class ChannelExec extends ChannelSession {
 	}
 
 	@Override
-	public void start() throws JSchException {
+	protected void start() throws JSchException {
 		try {
 			sendRequests();
 			new RequestExec(_command).request(_session, this);

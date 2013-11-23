@@ -715,9 +715,7 @@ public final class Session implements Runnable {
 						readBuffer.getInt();
 						readBuffer.getShort();
 						channel = _channels.get(readBuffer.getInt());
-						channel.setRecipient(readBuffer.getInt());
-						channel.setRemoteWindowSize(readBuffer.getUInt());
-						channel.setRemotePacketSize(readBuffer.getInt());
+						channel.initChannel(readBuffer);
 						break;
 
 					case SSH_MSG_CHANNEL_OPEN_FAILURE:

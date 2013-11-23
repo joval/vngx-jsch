@@ -51,7 +51,7 @@ public class ChannelShell extends ChannelSession {
 	}
 
 	@Override
-	public void start() throws JSchException {
+	protected void start() throws JSchException {
 		try {
 			sendRequests();
 			new RequestShell().request(_session, this);

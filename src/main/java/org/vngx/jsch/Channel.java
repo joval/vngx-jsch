@@ -263,12 +263,9 @@ public abstract class Channel implements Runnable {
 	 * Starts the channel after connection through the session.  Implementations
 	 * can override this method to define specific behavior.
 	 *
-	 * TODO Should this method be publicly exposed?  It's always called after
-	 * a successful connection... should external code ever need to call it?
-	 *
 	 * @throws JSchException
 	 */
-	public void start() throws JSchException { }
+	protected void start() throws JSchException { }
 
 	/**
 	 * Sets the <code>InputStream</code> to read channel input from SSH server.

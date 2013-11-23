@@ -58,7 +58,7 @@ public class ChannelSubsystem extends ChannelSession {
 	}
 
 	@Override
-	public void start() throws JSchException {
+	protected void start() throws JSchException {
 		try {
 			// Send X11 request if x-forwarding is enabled
 			if( _x11Forwarding ) {

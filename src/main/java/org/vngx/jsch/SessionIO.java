@@ -294,15 +294,17 @@ final class SessionIO {
 	 * @throws IOException
 	 */
 	int getByte(Buffer buffer, int length) throws IOException {
-		int bytesRead;
+		int totalRead = 0;
 		do {
+			int bytesRead = 0;
 			if( (bytesRead = _sessionIn.read(buffer.buffer, buffer.index, length)) < 0 ) {
 				throw new IOException("End of Session InputStream");
 			}
+			totalRead += bytesRead;
 			buffer.skip(bytesRead);	// Update buffer's internal index and
 			length -= bytesRead;	// update amount left to read in and keep
 		} while( length > 0 );		// looping until finished
-		return bytesRead;			// Return the amount of bytes read in
+		return totalRead;		// Return the total amount of bytes read in
 	}
 
 	/**

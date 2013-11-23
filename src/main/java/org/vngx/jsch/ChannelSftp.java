@@ -142,7 +142,7 @@ public final class ChannelSftp extends ChannelSession {
 	}
 
 	@Override
-	public void start() throws JSchException {
+	protected void start() throws JSchException {
 		try {
 			PipedOutputStream pos = new PipedOutputStream();
 			_io.setOutputStream(pos);
