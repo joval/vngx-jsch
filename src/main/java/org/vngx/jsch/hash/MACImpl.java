@@ -230,5 +230,4 @@ public class MACImpl implements MAC {
 			super("HmacSHA256", 32);
 		}
 	}
-
 }

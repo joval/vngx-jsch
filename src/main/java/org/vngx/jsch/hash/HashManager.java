@@ -47,6 +47,7 @@ public final class HashManager {
 
 	/** Algorithm factory for generating {@code Hash} instances. */
 	private AlgorithmFactory<Hash> _hashFactory;
+
 	/** Algorithm factory for generating {@code MAC} instances. */
 	private AlgorithmFactory<MAC> _macFactory;
 
@@ -181,6 +182,7 @@ public final class HashManager {
 					setAlgorithmImpl(MAC.HMAC_SHA1,		MACImpl.HMAC_SHA1.class);
 					setAlgorithmImpl(MAC.HMAC_SHA1_96,	MACImpl.HMAC_SHA1_96.class);
 					setAlgorithmImpl(MAC.HMAC_SHA_256,	MACImpl.HMAC_SHA_256.class);
+					setAlgorithmImpl(MAC.HMAC_SHA2_256,	MACImpl.HMAC_SHA_256.class);
 				}
 			};
 		}

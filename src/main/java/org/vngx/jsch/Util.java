@@ -49,12 +49,9 @@ public final class Util {
 
 	/** Constant array of Base 64 characters. */
 	private static final byte[] B64 = str2byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=");
+
 	/** Constant array of hexadecimal characters. */
-	private static final char[] HEXDEC_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-	/** MD5 hash implementation to use for generating fingerprints. */
-	private static Hash $md5Hash;
-
+	private static final char[] HEXDEC_CHARS = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 
 	/** Private constructor to prevent instantiation of static utility class. */
 	private Util() { }
@@ -418,11 +415,8 @@ public final class Util {
 	 * @return MD5 hash fingerprint
 	 * @throws JSchException if any errors occur
 	 */
-	public synchronized static String getFingerPrint(byte[] data) throws JSchException {
-		if( $md5Hash == null ) {
-			$md5Hash = HashManager.getManager().createHash(Hash.HASH_MD5);
-		}
-		return getFingerPrint($md5Hash, data);
+	public static String getFingerPrint(byte[] data) throws JSchException {
+		return getFingerPrint(getMD5(), data);
 	}
 
 	/**
@@ -622,5 +616,12 @@ public final class Util {
 			Arrays.fill(copy, src.length, newSize, (byte) 0);
 		}
 		return	copy;
+	}
+
+	/**
+	 * MD5 hash implementation to use for generating fingerprints.
+	 */
+	private static Hash getMD5() throws JSchException {
+		return HashManager.getManager().createHash(Hash.HASH_MD5);
 	}
 }

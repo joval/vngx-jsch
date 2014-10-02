@@ -96,12 +96,18 @@ public class JSchConfig implements SSHConfigConstants {
 		// Set the defaults for key exchange proposals
 		DEFAULTS.put(KEX_ALGORITHMS, "diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1");
 		DEFAULTS.put(KEX_SERVER_HOST_KEY, "ssh-rsa,ssh-dss");
-		DEFAULTS.put(KEX_CIPHER_S2C, "aes128-ctr,3des-ctr,blowfish-cbc,aes192-cbc,aes256-cbc,aes128-cbc,3des-cbc");
-		DEFAULTS.put(KEX_CIPHER_C2S, "aes128-ctr,3des-ctr,blowfish-cbc,aes192-cbc,aes256-cbc,aes128-cbc,3des-cbc");
-		DEFAULTS.put(KEX_MAC_S2C, "hmac-sha256,hmac-sha1,hmac-md5,hmac-sha1-96,hmac-md5-96");
-		DEFAULTS.put(KEX_MAC_C2S, "hmac-sha256,hmac-sha1,hmac-md5,hmac-sha1-96,hmac-md5-96");
+
+		String ciphers = "aes128-ctr,3des-ctr,blowfish-cbc,aes192-cbc,aes256-cbc,aes128-cbc,3des-cbc";
+		DEFAULTS.put(KEX_CIPHER_S2C, ciphers);
+		DEFAULTS.put(KEX_CIPHER_C2S, ciphers);
+
+		String macs = "hmac-sha256,hmac-sha2-256,hmac-sha1,hmac-md5,hmac-sha1-96,hmac-md5-96";
+		DEFAULTS.put(KEX_MAC_S2C, macs);
+		DEFAULTS.put(KEX_MAC_C2S, macs);
+
 		DEFAULTS.put(KEX_COMPRESSION_S2C, Compression.COMPRESSION_NONE);
 		DEFAULTS.put(KEX_COMPRESSION_C2S, Compression.COMPRESSION_NONE);
+
 		DEFAULTS.put(KEX_LANG_S2C, EMPTY);
 		DEFAULTS.put(KEX_LANG_C2S, EMPTY);
 

@@ -136,5 +136,4 @@ public class HashImpl implements Hash {
 			super("SHA-256", 32);
 		}
 	}
-
 }

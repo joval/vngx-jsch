@@ -52,8 +52,10 @@ public interface Hash extends Algorithm {
 
 	/** Algorithm name {@value} for SHA-1 {@code Hash} algorithm. */
 	String HASH_SHA1 = "sha-1";
+
 	/** Algorithm name {@value} for MD5 {@code Hash} algorithm. */
 	String HASH_MD5	= "md5";
+
 	/** Algorithm name {@value} for SHA-256 {@code Hash} algorithm. */
 	String HASH_SHA256 = "sha-256";
 

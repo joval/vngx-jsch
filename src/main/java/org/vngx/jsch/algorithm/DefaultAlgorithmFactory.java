@@ -61,10 +61,10 @@ public class DefaultAlgorithmFactory<T extends Algorithm> implements AlgorithmFa
 	/** Map which maintains the algorithm implementation class for each algorithm name. */
 	protected final ConcurrentMap<String,Class<? extends T>> _algorithmImplMap =
 			new ConcurrentHashMap<String,Class<? extends T>>();
+
 	/** Map which stores which algorithms are checked based on fully qualified class. */
 	protected final ConcurrentMap<String,Boolean> _checkedAlgorithms =
 			new ConcurrentHashMap<String,Boolean>();
-
 
 	/**
 	 * Creates a new instance of {@code DefaultAlgorithmFactory} which

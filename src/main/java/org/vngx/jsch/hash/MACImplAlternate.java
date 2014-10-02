@@ -263,5 +263,4 @@ public abstract class MACImplAlternate implements MAC {
 			super("SHA-256");
 		}
 	}
-
 }

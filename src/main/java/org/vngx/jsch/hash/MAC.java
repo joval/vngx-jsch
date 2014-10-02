@@ -101,21 +101,30 @@ public interface MAC extends Algorithm {
 	 * (digest length = key length = 20)
 	 */
 	String HMAC_SHA1 = "hmac-sha1";
+
 	/** 
 	 * Algorithm name {@value} for {@code MAC} algorithm using first 96 bits of
 	 * SHA-1 hash. (digest length = 12, key length = 20)
 	 */
-	String HMAC_SHA1_96	= "hmac-sha1-96";
+	String HMAC_SHA1_96 = "hmac-sha1-96";
+
 	/** 
 	 * Algorithm name {@value} for {@code MAC} algorithm using SHA-256 for hash.
 	 * (digest length = key length = 32)
 	 */
 	String HMAC_SHA_256 = "hmac-sha256";
+
+	/** 
+	 * An alias for the HMAC_SHA_256 hash.
+	 */
+	String HMAC_SHA2_256 = "hmac-sha2-256";
+
 	/**
 	 * Algorithm name {@value} for {@code MAC} algorithm using MD5 for hash.
 	 * (digest length = key length = 16)
 	 */
 	String HMAC_MD5	= "hmac-md5";
+
 	/**
 	 * Algorithm name {@value} for {@code MAC} algorithm using first 96 bits of
 	 * MD5 hash. (digest length = 12, key length = 16)

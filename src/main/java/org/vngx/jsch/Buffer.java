@@ -62,11 +62,12 @@ public final class Buffer {
 
 	/** Array to serve as data buffer. */
 	byte[] buffer;
+
 	/** Current index in the buffer when writing/putting data. */
 	int index;
+
 	/** Current offset in the buffer when reading/getting data. */
 	private int _offset;
-
 
 	/**
 	 * Creates a new instance of {@code Buffer} with the default size of

@@ -51,16 +51,13 @@ class HashedHostKey extends HostKey {
 
 	/** Constant for start of host indicating to create hash. */
 	static final String HASH_MAGIC = "|1|";
+
 	/** Constant for delimiter in host when HASH_MAGIC is present. */
 	static final String HASH_DELIM = "|";
 	
-	/** Instance of random for creating hashed keys. */
-	private static Random $random;
-	/** Message authentication code instance for creating hashes. */
-	private static MAC $hmacsha1;
-
 	/** Salt value used to hash the host value. */
 	private byte[] _salt;
+
 	/** Hash retrieved from host. */
 	private byte[] _hashedHost;
 
@@ -125,13 +122,11 @@ class HashedHostKey extends HostKey {
 		getRandom().fill(_salt, 0, _salt.length);
 
 		try {	// Create the hashed host using salt and MAC-SHA1
-			synchronized( macsha1 ) {	// MAC is not thread-safe
-				macsha1.init(_salt);
-				byte[] hostBytes = Util.str2byte(_host);
-				macsha1.update(hostBytes, 0, hostBytes.length);
-				_hashedHost = new byte[macsha1.getBlockSize()];
-				macsha1.doFinal(_hashedHost, 0);
-			}
+			macsha1.init(_salt);
+			byte[] hostBytes = Util.str2byte(_host);
+			macsha1.update(hostBytes, 0, hostBytes.length);
+			_hashedHost = new byte[macsha1.getBlockSize()];
+			macsha1.doFinal(_hashedHost, 0);
 		} catch(Exception e) {
 			throw new JSchException("Failed to create HashedHostKey: " + e, e);
 		}
@@ -155,14 +150,12 @@ class HashedHostKey extends HostKey {
 	public boolean isMatched(String host) {
 		try {
 			MAC macsha1 = getMAC();
-			synchronized( macsha1 ) {	// MAC is not thread-safe
-				macsha1.init(_salt);
-				byte[] hostBytes = Util.str2byte(host);
-				macsha1.update(hostBytes, 0, hostBytes.length);
-				byte[] hashValue = new byte[macsha1.getBlockSize()];
-				macsha1.doFinal(hashValue, 0);
-				return Arrays.equals(_hashedHost, hashValue);
-			}
+			macsha1.init(_salt);
+			byte[] hostBytes = Util.str2byte(host);
+			macsha1.update(hostBytes, 0, hostBytes.length);
+			byte[] hashValue = new byte[macsha1.getBlockSize()];
+			macsha1.doFinal(hashValue, 0);
+			return Arrays.equals(_hashedHost, hashValue);
 		} catch(Exception e) {
 			throw new IllegalStateException("Failed to check HashedHostKey isMatched(): "+e, e);
 		}
@@ -178,11 +171,8 @@ class HashedHostKey extends HostKey {
 	 *
 	 * @return HMAC-SHA1 MAC instance
 	 */
-	private synchronized static MAC getMAC() throws JSchException {
-		if( $hmacsha1 == null ) {
-			$hmacsha1 = HashManager.getManager().createMAC(MAC.HMAC_SHA1);
-		}
-		return $hmacsha1;
+	private static MAC getMAC() throws JSchException {
+		return HashManager.getManager().createMAC(MAC.HMAC_SHA1);
 	}
 
 	/**
@@ -190,11 +180,8 @@ class HashedHostKey extends HostKey {
 	 *
 	 * @return instance of random
 	 */
-	private synchronized static Random getRandom() throws JSchException {
-		if( $random == null ) {
-			$random = AlgorithmManager.getManager().createAlgorithm(Algorithms.RANDOM);
-		}
-		return $random;
+	private static Random getRandom() throws JSchException {
+		return AlgorithmManager.getManager().createAlgorithm(Algorithms.RANDOM);
 	}
 
 }
