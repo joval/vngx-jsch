@@ -108,6 +108,18 @@ public final class Buffer {
 	}
 
 	/**
+	 * Creates a new instance of {@code Buffer} wrapping the specified byte
+	 * {@code buffer} starting at the specified offset.
+	 *
+	 * @param buffer to wrap
+	 * @param offset the initial offset
+	 */
+	public Buffer(final byte[] buffer, int offset) {
+	    this(buffer);
+	    index = offset;
+	}
+
+	/**
 	 * Puts the specified {@code byte} into the buffer at the current index.
 	 *
 	 * @param b byte to put in buffer

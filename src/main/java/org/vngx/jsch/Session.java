@@ -46,9 +46,13 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -68,6 +72,24 @@ import javax.net.ServerSocketFactory;
  * @author Michael Laudati
  */
 public final class Session implements Runnable {
+	private static final InetAddress IP4_LOCALHOST, IP6_LOCALHOST;
+	static {
+		try {
+			IP4_LOCALHOST = InetAddress.getByAddress(
+				new byte[] {(byte)0x7F, (byte)0x00, (byte)0x00, (byte)0x01}
+			);
+			IP6_LOCALHOST = InetAddress.getByAddress(
+				new byte[] {
+					(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+					(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+					(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+					(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x01
+				}
+			);
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	/** Constant for keep alive message sent to SSH server. */
 	private static final byte[] KEEP_ALIVE_MSG = Util.str2byte("keepalive@vngx.org");
@@ -141,6 +163,7 @@ public final class Session implements Runnable {
 	private Logger $logger = Logger.NULL_LOGGER;
 
 	private SessionIO _sessionIO;
+	private Boolean _local = null;
 
 	/** Session's configuration instance (allows override of global properties). */
 	private final SessionConfig _config;
@@ -1424,6 +1447,31 @@ public final class Session implements Runnable {
 		if( threadFactory != null ) {
 			_threadFactory = threadFactory;
 		}
+	}
+
+	/**
+	 * Returns true if the Session's socket is connected to a local address (i.e., one of the host's own network
+	 * addresses.
+	 */
+	boolean isLocal() throws SocketException {
+		if (_local != null) {
+			return _local.booleanValue();
+		}
+
+		InetAddress remote = _socket.getInetAddress();
+
+		if (IP4_LOCALHOST.equals(remote) || IP6_LOCALHOST.equals(remote)) {
+			return (_local = Boolean.TRUE).booleanValue();
+		}
+
+		for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+			for (InetAddress ia : Collections.list(ni.getInetAddresses())) {
+				if (ia.equals(remote)) {
+					return (_local = Boolean.TRUE).booleanValue();
+				}
+			}
+		}
+		return (_local = Boolean.FALSE).booleanValue();
 	}
 
 	/**

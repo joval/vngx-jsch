@@ -276,14 +276,7 @@ final class SessionIO {
 	 * @throws IOException
 	 */
 	void getByte(byte[] buffer, int start, int length) throws IOException {
-		int bytesRead;
-		do {
-			if( (bytesRead = _sessionIn.read(buffer, start, length)) < 0 ) {
-				throw new IOException("End of Session InputStream");
-			}
-			start += bytesRead;
-			length -= bytesRead;
-		} while( length > 0 );
+		getByte(new Buffer(buffer, start), length);
 	}
 
 	/**
@@ -296,14 +289,26 @@ final class SessionIO {
 	int getByte(Buffer buffer, int length) throws IOException {
 		int totalRead = 0;
 		do {
+			//
+			// On VMWare guests, SSH connections to machine-local network adapters are susceptible to
+			// a race-condition preventing sent packets from being read.  This problem is mitigated by
+			// inserting a 10ms delay on reads.
+			//
+			if (_session.isLocal()) {
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+				}
+			}
+
 			int bytesRead = 0;
-			if( (bytesRead = _sessionIn.read(buffer.buffer, buffer.index, length)) < 0 ) {
+			if ((bytesRead = _sessionIn.read(buffer.buffer, buffer.index, length)) < 0) {
 				throw new IOException("End of Session InputStream");
 			}
 			totalRead += bytesRead;
 			buffer.skip(bytesRead);	// Update buffer's internal index and
 			length -= bytesRead;	// update amount left to read in and keep
-		} while( length > 0 );		// looping until finished
+		} while (length > 0);		// looping until finished
 		return totalRead;		// Return the total amount of bytes read in
 	}
 
