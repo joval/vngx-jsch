@@ -35,6 +35,8 @@ import org.vngx.jsch.Session;
 import org.vngx.jsch.Util;
 import org.vngx.jsch.constants.MessageConstants;
 import org.vngx.jsch.exception.JSchException;
+import org.vngx.jsch.util.Logger.Level;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,141 +50,138 @@ import java.util.Collections;
  */
 public final class UserAuthPublicKey extends UserAuth {
 
-	@Override
-	protected boolean authUser(Session session, byte[] password) throws Exception {
-		super.authUser(session, password);
+    @Override
+    protected boolean authUser(Session session, byte[] password) throws Exception {
+	super.authUser(session, password);
 
-		byte[] passphrase = null;
-		final Collection<Identity> identities;
-		if (_userinfo == null || _userinfo.getIdentity() == null) {
-		    identities = IdentityManager.getManager().getIdentities();
-		} else {
-		    identities = Collections.unmodifiableCollection(Arrays.asList(_userinfo.getIdentity()));
-		}
-		synchronized ( identities ) {
-			if( identities.isEmpty() ) {
-				return false;
-			}
-
-			for( Identity identity : identities ) {
-				byte[] pubkeyblob = identity.getPublicKeyBlob();
-
-				if( pubkeyblob != null ) {
-					// send
-					// byte      SSH_MSG_USERAUTH_REQUEST(50)
-					// string    user name
-					// string    service name ("ssh-connection")
-					// string    "publickey"
-					// boolen    FALSE
-					// string    plaintext password (ISO-10646 UTF-8)
-					_packet.reset();
-					_buffer.putByte(SSH_MSG_USERAUTH_REQUEST);
-					_buffer.putString(session.getUserName());
-					_buffer.putString(SSH_CONNECTION);
-					_buffer.putString(UserAuth.PUBLICKEY);
-					_buffer.putByte((byte) 0);
-					_buffer.putString(identity.getAlgorithmName());
-					_buffer.putString(pubkeyblob);
-					session.write(_packet);
-
-					boolean read_more = true;
-					boolean failed = false;
-					while( read_more ) {
-						switch( session.read(_buffer).getCommand() & 0xff ) {
-							case SSH_MSG_USERAUTH_BANNER:
-								userAuthBanner();
-								break;
-							case SSH_MSG_USERAUTH_PK_OK:
-								read_more = false;
-								break;
-							case SSH_MSG_USERAUTH_FAILURE:
-							default:
-								failed = true;
-								read_more = false;
-						}
-					}
-					if (failed)
-						continue;
-				}
-
-				int count = 5;	// Make this configurable, 5 attempts to enter correct passphrase
-				while( count-- > 0 ) {
-					if( identity.isEncrypted() ) {
-						if( _userinfo == null ) {
-							throw new JSchException("UserAuth 'publickey' fail: identity is encrypted, no passphrase");
-						} else if( !_userinfo.promptPassphrase(String.format(MessageConstants.PROMPT_PASSPHRASE, identity.getName())) ) {
-							throw new AuthCancelException("UserAuth 'publickey' canceled by user");
-						}
-						if( _userinfo.getPassphrase() != null ) {
-							passphrase = _userinfo.getPassphrase();
-						}
-					}
-
-					if( (!identity.isEncrypted() || passphrase != null) && identity.setPassphrase(passphrase) ) {
-						break;
-					}
-					Util.bzero(passphrase);
-					passphrase = null;
-				}
-				Util.bzero(passphrase);
-				passphrase = null;
-
-				if( identity.isEncrypted() ) {
-					continue;
-				}
-				if( pubkeyblob == null ) {
-					pubkeyblob = identity.getPublicKeyBlob();
-				}
-				if( pubkeyblob == null ) {
-					continue;
-				}
-
-				// send
-				// byte      SSH_MSG_USERAUTH_REQUEST(50)
-				// string    user name
-				// string    service name ("ssh-connection")
-				// string    "publickey"
-				// boolen    TRUE
-				// string    plaintext password (ISO-10646 UTF-8)
-				_packet.reset();
-				_buffer.setOffSet(0);
-				_buffer.putByte(SSH_MSG_USERAUTH_REQUEST);
-				_buffer.putString(session.getUserName());
-				_buffer.putString(SSH_CONNECTION);
-				_buffer.putString(UserAuth.PUBLICKEY);
-				_buffer.putByte((byte) 1);
-				_buffer.putString(identity.getAlgorithmName());
-				_buffer.putString(pubkeyblob);
-
-				byte[] sid = session.getSessionId();
-				byte[] tmpData = new byte[4 + sid.length + _buffer.getLength() - 5];
-				Buffer tmp = new Buffer(tmpData);
-				tmp.putString(sid);
-				tmp.putBytes(_buffer, 5, _buffer.getLength()-5);
-				byte[] signature = identity.getSignature(tmpData);
-				if( signature == null ) {  // for example, too long key length.
-					break;
-				}
-				_buffer.putString(signature);
-				session.write(_packet);
-
-				boolean read_more = true;
-				while( read_more ) {
-					switch( session.read(_buffer).getCommand() & 0xff ) {
-						case SSH_MSG_USERAUTH_SUCCESS:
-							return true;	// User successfully authed by publickey!
-
-						case SSH_MSG_USERAUTH_BANNER:
-							userAuthBanner();
-							break;
-
-						case SSH_MSG_USERAUTH_FAILURE:
-							userAuthFailure();
-							read_more = false;	// Handle user auth failure and continue
-					}
-				}
-			}
-		}
-		return false;
+	final Collection<Identity> identities;
+	if (_userinfo == null || _userinfo.getIdentity() == null) {
+	    identities = IdentityManager.getManager().getIdentities();
+	} else {
+	    identities = Collections.unmodifiableCollection(Arrays.asList(_userinfo.getIdentity()));
 	}
+	synchronized (identities) {
+	    if (identities.isEmpty()) {
+		return false;
+	    }
+
+	    for (Identity identity : identities) {
+		byte[] pubkeyblob = identity.getPublicKeyBlob();
+
+		if (pubkeyblob != null) {
+		    // send
+		    // byte      SSH_MSG_USERAUTH_REQUEST(50)
+		    // string    user name
+		    // string    service name ("ssh-connection")
+		    // string    "publickey"
+		    // boolen    FALSE
+		    // string    plaintext password (ISO-10646 UTF-8)
+		    _packet.reset();
+		    _buffer.putByte(SSH_MSG_USERAUTH_REQUEST);
+		    _buffer.putString(session.getUserName());
+		    _buffer.putString(SSH_CONNECTION);
+		    _buffer.putString(UserAuth.PUBLICKEY);
+		    _buffer.putByte((byte) 0);
+		    _buffer.putString(identity.getAlgorithmName());
+		    _buffer.putString(pubkeyblob);
+		    session.write(_packet);
+
+		    boolean read_more = true;
+		    boolean failed = false;
+		    while( read_more ) {
+			switch( session.read(_buffer).getCommand() & 0xff ) {
+			  case SSH_MSG_USERAUTH_BANNER:
+			    userAuthBanner();
+			    break;
+			  case SSH_MSG_USERAUTH_PK_OK:
+			    read_more = false;
+			    break;
+			  case SSH_MSG_USERAUTH_FAILURE:
+			  default:
+			    failed = true;
+			    read_more = false;
+			}
+		    }
+		    if (failed)
+			continue;
+		}
+
+		int count = 5;    // Make this configurable, 5 attempts to enter correct passphrase
+		while (count-- > 0) {
+		    if (identity.isEncrypted()) {
+			if (_userinfo == null) {
+			    throw new JSchException("UserAuth 'publickey' fail: identity is encrypted, no passphrase");
+			} else if (!_userinfo.promptPassphrase(String.format(MessageConstants.PROMPT_PASSPHRASE, identity.getName()))) {
+			    throw new AuthCancelException("UserAuth 'publickey' canceled by user");
+			}
+			if (_userinfo.getPassphrase() != null && identity.setPassphrase(_userinfo.getPassphrase())) {
+			    break;
+			}
+		    } else {
+			break;
+		    }
+		}
+
+		if (identity.isEncrypted()) {
+		    continue;
+		}
+		if (pubkeyblob == null) {
+		    pubkeyblob = identity.getPublicKeyBlob();
+		}
+		if (pubkeyblob == null) {
+		    continue;
+		}
+
+		// send
+		// byte      SSH_MSG_USERAUTH_REQUEST(50)
+		// string    user name
+		// string    service name ("ssh-connection")
+		// string    "publickey"
+		// boolen    TRUE
+		// string    plaintext password (ISO-10646 UTF-8)
+		_packet.reset();
+		_buffer.setOffSet(0);
+		_buffer.putByte(SSH_MSG_USERAUTH_REQUEST);
+		_buffer.putString(session.getUserName());
+		_buffer.putString(SSH_CONNECTION);
+		_buffer.putString(UserAuth.PUBLICKEY);
+		_buffer.putByte((byte) 1);
+		_buffer.putString(identity.getAlgorithmName());
+		_buffer.putString(pubkeyblob);
+
+		byte[] sid = session.getSessionId();
+		byte[] tmpData = new byte[4 + sid.length + _buffer.getLength() - 5];
+		Buffer tmp = new Buffer(tmpData);
+		tmp.putString(sid);
+		tmp.putBytes(_buffer, 5, _buffer.getLength()-5);
+		byte[] signature = identity.getSignature(tmpData);
+		if (signature == null) {
+		    // for example, too long key length.
+		    break;
+		}
+		_buffer.putString(signature);
+		session.write(_packet);
+
+		boolean read_more = true;
+		while(read_more) {
+		    switch( session.read(_buffer).getCommand() & 0xff ) {
+		      case SSH_MSG_USERAUTH_SUCCESS:
+			// User successfully authed by publickey!
+			return true;
+
+		      case SSH_MSG_USERAUTH_BANNER:
+			userAuthBanner();
+			break;
+
+		      case SSH_MSG_USERAUTH_FAILURE:
+			userAuthFailure();
+			// Handle user auth failure and continue
+			read_more = false;
+			break;
+		    }
+		}
+	    }
+	}
+	return false;
+    }
 }

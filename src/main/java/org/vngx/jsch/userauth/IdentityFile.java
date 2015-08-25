@@ -345,6 +345,12 @@ public class IdentityFile implements Identity {
 			}
 
 			if( pubkey == null ) {
+				if (!_encrypted) {
+					//
+					// Calling the decrypt() method will set the public key derived from the private key
+					//
+					decrypt();
+				}
 				return;
 			}
 
@@ -456,6 +462,7 @@ public class IdentityFile implements Identity {
 				if( passphrase == null ) {
 					return false;
 				}
+
 				int hsize = _hash.getBlockSize();
 				byte[] hn = new byte[_key.length / hsize * hsize + (_key.length % hsize == 0 ? 0 : hsize)];
 				byte[] tmp = null;
