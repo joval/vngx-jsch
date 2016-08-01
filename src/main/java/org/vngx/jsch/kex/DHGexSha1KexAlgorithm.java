@@ -124,19 +124,21 @@ public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 		    Pattern p = Pattern.compile("^(\\d*\\.\\d*)");
 		    Matcher m = p.matcher(javaVersion);
 		    if (m.find()) {
-			float version = Float.parseFloat(m.group(0));
-			if (version >= 1.8) {
-			    //
-			    // Starting in Java 1.8, the default JCE permits a maximum size of 2048.
-			    //
-			    PREFERRED_GROUP_BITS = 2048;
-			    MAX_GROUP_BITS = 2048;
-			} else {
+			String[] sa = m.group(0).split("\\.");
+			int major = Integer.parseInt(sa[0]);
+			int minor = Integer.parseInt(sa[1]);
+			if (major == 1 && minor < 8) {
 			    //
 			    // Prior to Java 1.8, the maximum size is 1024.
 			    //
 			    PREFERRED_GROUP_BITS = 1024;
 			    MAX_GROUP_BITS = 1024;
+			} else {
+			    //
+			    // Starting in Java 1.8, the default JCE permits a maximum size of 2048.
+			    //
+			    PREFERRED_GROUP_BITS = 2048;
+			    MAX_GROUP_BITS = 2048;
 			}
 		    } else {
 			throw new RuntimeException("Unable to determine Java version: " + javaVersion);
