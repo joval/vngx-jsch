@@ -114,10 +114,11 @@ public class CipherImpl implements Cipher {
 		key = validateKeySize(key);	// Update key size if too large
 		try {
 			// Retrieve cipher instance based on JCE provider specified in CipherManager
-			_cipher = JSchConfig.getConfig().getString(JSchConfig.DEFAULT_SECURITY_PROVIDER).length()==0 ?
-						javax.crypto.Cipher.getInstance(_cipherName) :
-						javax.crypto.Cipher.getInstance(_cipherName, 
-								JSchConfig.getConfig().getString(JSchConfig.DEFAULT_SECURITY_PROVIDER));
+			if (JSchConfig.getConfig().getString(JSchConfig.DEFAULT_SECURITY_PROVIDER).length() == 0) {
+				_cipher = javax.crypto.Cipher.getInstance(_cipherName);
+			} else {
+				_cipher = javax.crypto.Cipher.getInstance(_cipherName, JSchConfig.getConfig().getString(JSchConfig.DEFAULT_SECURITY_PROVIDER));
+			}
 			_cipher.init(mode, new SecretKeySpec(key, _keyName), new IvParameterSpec(iv));
 		} catch(Exception e) {
 			_cipher = null;

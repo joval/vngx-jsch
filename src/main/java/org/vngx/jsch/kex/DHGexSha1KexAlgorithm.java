@@ -31,9 +31,15 @@ package org.vngx.jsch.kex;
 import static org.vngx.jsch.constants.TransportLayerProtocol.*;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.vngx.jsch.Buffer;
 import org.vngx.jsch.JSch;
 import org.vngx.jsch.Session;
+import org.vngx.jsch.config.JSchConfig;
+import org.vngx.jsch.config.SSHConfigConstants;
 import org.vngx.jsch.exception.JSchException;
 import org.vngx.jsch.hash.Hash;
 import org.vngx.jsch.util.Logger;
@@ -93,13 +99,55 @@ import org.vngx.jsch.util.Logger;
  */
 public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 
-	// TODO Consider making min, preferred and max configurable values
 	/** Constant for minimal size in bits of an acceptable group. */
 	static final int MIN_GROUP_BITS = 1024;
+
 	/** Constant for preferred size in bits of the group the server will send. */
-	static final int PREFERRED_GROUP_BITS = 1024;
-	/** Constant for maximal size in bits of an acceptable group. */
-	static final int MAX_GROUP_BITS = 1024;
+	static final int PREFERRED_GROUP_BITS;
+
+	/** Constant for maximal size in bits of an acceptable group.  */
+	static final int MAX_GROUP_BITS;
+
+	//
+	// Configure values for PREFERRED_GROUP_BITS and MAX_GROUP_BITS based on the JCA implementation that will be used.
+	//
+	static {
+	    if ("BC".equals(JSchConfig.getConfig().getString(SSHConfigConstants.DEFAULT_SECURITY_PROVIDER))) {
+		//
+		// The BouncyCastle provider seems to have no fixed size limit.
+		//
+		PREFERRED_GROUP_BITS = 2048;
+		MAX_GROUP_BITS = 8192;
+	    } else {
+		try {
+		    String javaVersion = System.getProperty("java.specification.version");
+		    Pattern p = Pattern.compile("^(\\d*\\.\\d*)");
+		    Matcher m = p.matcher(javaVersion);
+		    if (m.find()) {
+			float version = Float.parseFloat(m.group(0));
+			if (version >= 1.8) {
+			    //
+			    // Starting in Java 1.8, the default JCE permits a maximum size of 2048.
+			    //
+			    PREFERRED_GROUP_BITS = 2048;
+			    MAX_GROUP_BITS = 2048;
+			} else {
+			    //
+			    // Prior to Java 1.8, the maximum size is 1024.
+			    //
+			    PREFERRED_GROUP_BITS = 1024;
+			    MAX_GROUP_BITS = 1024;
+			}
+		    } else {
+			throw new RuntimeException("Unable to determine Java version: " + javaVersion);
+		    }
+		} catch (PatternSyntaxException e) {
+		    throw new RuntimeException(e);
+		} catch (NumberFormatException e) {
+		    throw new RuntimeException(e);
+		}
+	    }
+	}
 
 	/** Safe prime 'p' from server. */
 	private byte[] _p;

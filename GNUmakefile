@@ -33,8 +33,8 @@ clean:
 classes: classdirs $(CLASS_FILES)
 
 install: all
-	cp JSch.jar $(TOP)/repositories/jOVAL-Commercial/components/provider/remote/rsrc/lib
-	cp JSch.jar $(TOP)/repositories/jOVAL-Commercial/components/sdk/dist/3rd-party
+	cp JSch.jar $(TOP)/../jOVAL-Commercial/components/provider/remote/rsrc/lib
+	cp JSch.jar $(TOP)/../jOVAL-Commercial/components/sdk/dist/3rd-party
 
 classdirs: $(foreach pkg, $(PACKAGEDIRS), $(BUILD)/$(pkg)/)
 

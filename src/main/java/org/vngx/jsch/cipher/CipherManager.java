@@ -157,19 +157,19 @@ public final class CipherManager {
 			// the packaged Cipher instances
 			_cipherFactory = new DefaultAlgorithmFactory<Cipher>(Cipher.class) {
 				{
-					setAlgorithmImpl(Cipher.CIPHER_3DES_CBC,		CipherImpl.TripleDESCBC.class);
-					setAlgorithmImpl(Cipher.CIPHER_3DES_CTR,		CipherImpl.TripleDESCTR.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES128_CBC,		CipherImpl.AES128CBC.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES128_CTR,		CipherImpl.AES128CTR.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES192_CBC,		CipherImpl.AES192CBC.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES192_CTR,		CipherImpl.AES192CTR.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES256_CBC,		CipherImpl.AES256CBC.class);
-					setAlgorithmImpl(Cipher.CIPHER_AES256_CTR,		CipherImpl.AES256CTR.class);
+					setAlgorithmImpl(Cipher.CIPHER_3DES_CBC,	CipherImpl.TripleDESCBC.class);
+					setAlgorithmImpl(Cipher.CIPHER_3DES_CTR,	CipherImpl.TripleDESCTR.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES128_CBC,	CipherImpl.AES128CBC.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES128_CTR,	CipherImpl.AES128CTR.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES192_CBC,	CipherImpl.AES192CBC.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES192_CTR,	CipherImpl.AES192CTR.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES256_CBC,	CipherImpl.AES256CBC.class);
+					setAlgorithmImpl(Cipher.CIPHER_AES256_CTR,	CipherImpl.AES256CTR.class);
 					setAlgorithmImpl(Cipher.CIPHER_ARCFOUR,		CipherImpl.ARCFOUR.class);
-					setAlgorithmImpl(Cipher.CIPHER_ARCFOUR128,		CipherImpl.ARCFOUR128.class);
-					setAlgorithmImpl(Cipher.CIPHER_ARCFOUR256,		CipherImpl.ARCFOUR256.class);
+					setAlgorithmImpl(Cipher.CIPHER_ARCFOUR128,	CipherImpl.ARCFOUR128.class);
+					setAlgorithmImpl(Cipher.CIPHER_ARCFOUR256,	CipherImpl.ARCFOUR256.class);
 					setAlgorithmImpl(Cipher.CIPHER_BLOWFISH_CBC,	CipherImpl.BlowfishCBC.class);
-					setAlgorithmImpl(Cipher.CIPHER_NONE,			CipherNone.class);
+					setAlgorithmImpl(Cipher.CIPHER_NONE,		CipherNone.class);
 				}
 
 				@Override
