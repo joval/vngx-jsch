@@ -137,7 +137,7 @@ public class DHGexSha1KexAlgorithm extends AbstractDHKexAlgorithm {
 			    //
 			    // Starting in Java 1.8, the default JCE permits a maximum size of 2048.
 			    //
-			    PREFERRED_GROUP_BITS = 2048;
+			    PREFERRED_GROUP_BITS = 1024;
 			    MAX_GROUP_BITS = 2048;
 			}
 		    } else {
